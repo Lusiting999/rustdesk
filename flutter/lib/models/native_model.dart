@@ -224,6 +224,7 @@ class PlatformFFI {
       () async {
         try {
           Map<String, dynamic> event = json.decode(message);
+          print('Sting startListenEvent:$event');
           // _tryHandle here may be more flexible than _eventCallback
           if (!await tryHandle(event)) {
             if (_eventCallback != null) {

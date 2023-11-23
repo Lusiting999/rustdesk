@@ -197,6 +197,7 @@ class Peers extends ChangeNotifier {
   }
 
   void _updatePeers(Map<String, dynamic> evt) {
+    print('Sting _updatePeers evt:$evt');
     final onlineStates = _getOnlineStates();
     if (initPeers != null) {
       peers = initPeers!;

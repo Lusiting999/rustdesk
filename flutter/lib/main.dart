@@ -406,7 +406,7 @@ class _AppState extends State<App> {
               ? const DesktopTabPage()
               : isWeb
                   ? WebHomePage()
-                  : HomePage2(),
+                  : HomePage(),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
