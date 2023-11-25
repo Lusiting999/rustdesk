@@ -54,7 +54,7 @@ class _HomePageState extends State<HomePage> {
     //String relay0 = oldOptions['relay-server'] ?? "";
     String idServer = oldOptions['custom-rendezvous-server'] ?? "";
     if (idServer.isEmpty) {
-      bind.mainSetOption(key: "custom-rendezvous-server", value: '34.83.47.116:21116');
+      bind.mainSetOption(key: "custom-rendezvous-server", value: 'remote.skywayplatform.com:21116');
     }
     String keyValue = oldOptions['key'] ?? "";
     if (keyValue.isEmpty) {
