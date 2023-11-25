@@ -19,6 +19,12 @@ import com.hjq.permissions.XXPermissions
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.awt.event.KeyEvent
+
+import java.lang.instrument.Instrumentation
+
+
+
 
 
 class MainActivity : FlutterActivity() {
@@ -237,6 +243,18 @@ class MainActivity : FlutterActivity() {
                     } finally {
                         result.success(true)
                     }
+                }
+                "send_key" -> {
+//                    try {
+//                        if (call.arguments is Int) {
+//                            val key = call.arguments as Int
+//                            val mInst: java.lang.instrument.Instrumentation = java.lang.instrument.Instrumentation
+//                            mInst.sendKeyDownUpSync(key)
+//                            Log.d("flutter","send_key sendKeyDownUpSync key:$key")
+//                        }
+//                    } finally {
+//                        result.success(true)
+//                    }
                 }
                 else -> {
                     result.error("-1", "No such method", null)

@@ -69,6 +69,7 @@ class InputModel {
   var _fling = false;
   Timer? _flingTimer;
   final _flingBaseDelay = 30;
+
   // trackpad, peer linux
   final _trackpadSpeed = 0.06;
   var _trackpadScrollUnsent = Offset.zero;
@@ -83,7 +84,9 @@ class InputModel {
   late final SessionID sessionId;
 
   bool get keyboardPerm => parent.target!.ffiModel.keyboard;
+
   String get id => parent.target?.id ?? '';
+
   String? get peerPlatform => parent.target?.ffiModel.pi.platform;
 
   InputModel(this.parent) {
@@ -91,6 +94,7 @@ class InputModel {
   }
 
   KeyEventResult handleRawKeyEvent(FocusNode data, RawKeyEvent e) {
+    print('Sting handleRawKeyEvent');
     if (isDesktop && !stateGlobal.grabKeyboard) {
       return KeyEventResult.handled;
     }
@@ -117,18 +121,13 @@ class InputModel {
       }
     }
     if (e is RawKeyUpEvent) {
-      if (key == LogicalKeyboardKey.altLeft ||
-          key == LogicalKeyboardKey.altRight) {
+      if (key == LogicalKeyboardKey.altLeft || key == LogicalKeyboardKey.altRight) {
         alt = false;
-      } else if (key == LogicalKeyboardKey.controlLeft ||
-          key == LogicalKeyboardKey.controlRight) {
+      } else if (key == LogicalKeyboardKey.controlLeft || key == LogicalKeyboardKey.controlRight) {
         ctrl = false;
-      } else if (key == LogicalKeyboardKey.shiftRight ||
-          key == LogicalKeyboardKey.shiftLeft) {
+      } else if (key == LogicalKeyboardKey.shiftRight || key == LogicalKeyboardKey.shiftLeft) {
         shift = false;
-      } else if (key == LogicalKeyboardKey.metaLeft ||
-          key == LogicalKeyboardKey.metaRight ||
-          key == LogicalKeyboardKey.superKey) {
+      } else if (key == LogicalKeyboardKey.metaLeft || key == LogicalKeyboardKey.metaRight || key == LogicalKeyboardKey.superKey) {
         command = false;
       }
     }
@@ -183,25 +182,16 @@ class InputModel {
     const numlock = 2;
     const scrolllock = 3;
     int lockModes = 0;
-    if (HardwareKeyboard.instance.lockModesEnabled
-        .contains(KeyboardLockMode.capsLock)) {
+    if (HardwareKeyboard.instance.lockModesEnabled.contains(KeyboardLockMode.capsLock)) {
       lockModes |= (1 << capslock);
     }
-    if (HardwareKeyboard.instance.lockModesEnabled
-        .contains(KeyboardLockMode.numLock)) {
+    if (HardwareKeyboard.instance.lockModesEnabled.contains(KeyboardLockMode.numLock)) {
       lockModes |= (1 << numlock);
     }
-    if (HardwareKeyboard.instance.lockModesEnabled
-        .contains(KeyboardLockMode.scrollLock)) {
+    if (HardwareKeyboard.instance.lockModesEnabled.contains(KeyboardLockMode.scrollLock)) {
       lockModes |= (1 << scrolllock);
     }
-    bind.sessionHandleFlutterKeyEvent(
-        sessionId: sessionId,
-        name: name,
-        platformCode: platformCode,
-        positionCode: positionCode,
-        lockModes: lockModes,
-        downOrUp: down);
+    bind.sessionHandleFlutterKeyEvent(sessionId: sessionId, name: name, platformCode: platformCode, positionCode: positionCode, lockModes: lockModes, downOrUp: down);
   }
 
   void legacyKeyboardMode(RawKeyEvent e) {
@@ -219,9 +209,7 @@ class InputModel {
 
   void sendRawKey(RawKeyEvent e, {bool? down, bool? press}) {
     // for maximum compatibility
-    final label = physicalKeyMap[e.physicalKey.usbHidUsage] ??
-        logicalKeyMap[e.logicalKey.keyId] ??
-        e.logicalKey.keyLabel;
+    final label = physicalKeyMap[e.physicalKey.usbHidUsage] ?? logicalKeyMap[e.logicalKey.keyId] ?? e.logicalKey.keyLabel;
     inputKey(label, down: down, press: press ?? false);
   }
 
@@ -230,18 +218,11 @@ class InputModel {
   /// [press] indicates a click event(down and up).
   void inputKey(String name, {bool? down, bool? press}) {
     if (!keyboardPerm) return;
-    bind.sessionInputKey(
-        sessionId: sessionId,
-        name: name,
-        down: down ?? false,
-        press: press ?? true,
-        alt: alt,
-        ctrl: ctrl,
-        shift: shift,
-        command: command);
+    bind.sessionInputKey(sessionId: sessionId, name: name, down: down ?? false, press: press ?? true, alt: alt, ctrl: ctrl, shift: shift, command: command);
   }
 
   Map<String, dynamic> _getMouseEvent(PointerEvent evt, String type) {
+    print('Sting _getMouseEvent');
     final Map<String, dynamic> out = {};
 
     // Check update event type and set buttons to be sent.
@@ -291,10 +272,7 @@ class InputModel {
 
   /// Send scroll event with scroll distance [y].
   void scroll(int y) {
-    bind.sessionSendMouse(
-        sessionId: sessionId,
-        msg: json
-            .encode(modify({'id': id, 'type': 'wheel', 'y': y.toString()})));
+    bind.sessionSendMouse(sessionId: sessionId, msg: json.encode(modify({'id': id, 'type': 'wheel', 'y': y.toString()})));
   }
 
   /// Reset key modifiers to false, including [shift], [ctrl], [alt] and [command].
@@ -314,9 +292,7 @@ class InputModel {
   /// Send mouse press event.
   void sendMouse(String type, MouseButtons button) {
     if (!keyboardPerm) return;
-    bind.sessionSendMouse(
-        sessionId: sessionId,
-        msg: json.encode(modify({'type': type, 'buttons': button.value})));
+    bind.sessionSendMouse(sessionId: sessionId, msg: json.encode(modify({'type': type, 'buttons': button.value})));
   }
 
   void enterOrLeave(bool enter) {
@@ -330,12 +306,11 @@ class InputModel {
 
   /// Send mouse movement event with distance in [x] and [y].
   void moveMouse(double x, double y) {
+    print('Sting moveMouse');
     if (!keyboardPerm) return;
     var x2 = x.toInt();
     var y2 = y.toInt();
-    bind.sessionSendMouse(
-        sessionId: sessionId,
-        msg: json.encode(modify({'x': '$x2', 'y': '$y2'})));
+    bind.sessionSendMouse(sessionId: sessionId, msg: json.encode(modify({'x': '$x2', 'y': '$y2'})));
   }
 
   void onPointHoverImage(PointerHoverEvent e) {
@@ -360,16 +335,13 @@ class InputModel {
 
   // https://docs.flutter.dev/release/breaking-changes/trackpad-gestures
   void onPointerPanZoomUpdate(PointerPanZoomUpdateEvent e) {
+    print('Sting onPointerPanZoomUpdate');
     if (peerPlatform != kPeerPlatformAndroid) {
       final scale = ((e.scale - _lastScale) * 1000).toInt();
       _lastScale = e.scale;
 
       if (scale != 0) {
-        bind.sessionSendPointer(
-            sessionId: sessionId,
-            msg: json.encode(
-                PointerEventToRust(kPointerEventKindTouch, 'scale', scale)
-                    .toJson()));
+        bind.sessionSendPointer(sessionId: sessionId, msg: json.encode(PointerEventToRust(kPointerEventKindTouch, 'scale', scale).toJson()));
         return;
       }
     }
@@ -398,9 +370,7 @@ class InputModel {
       if (peerPlatform == kPeerPlatformAndroid) {
         handlePointerEvent('touch', 'pan_update', Offset(x.toDouble(), y.toDouble()));
       } else {
-        bind.sessionSendMouse(
-            sessionId: sessionId,
-            msg: '{"type": "trackpad", "x": "$x", "y": "$y"}');
+        bind.sessionSendMouse(sessionId: sessionId, msg: '{"type": "trackpad", "x": "$x", "y": "$y"}');
       }
     }
   }
@@ -436,9 +406,7 @@ class InputModel {
         return;
       }
 
-      bind.sessionSendMouse(
-          sessionId: sessionId,
-          msg: '{"type": "trackpad", "x": "$dx", "y": "$dy"}');
+      bind.sessionSendMouse(sessionId: sessionId, msg: '{"type": "trackpad", "x": "$dx", "y": "$dy"}');
       _scheduleFling(x, y, delay);
     });
   }
@@ -462,21 +430,16 @@ class InputModel {
       return;
     }
 
-    bind.sessionSendPointer(
-        sessionId: sessionId,
-        msg: json.encode(
-            PointerEventToRust(kPointerEventKindTouch, 'scale', 0).toJson()));
+    bind.sessionSendPointer(sessionId: sessionId, msg: json.encode(PointerEventToRust(kPointerEventKindTouch, 'scale', 0).toJson()));
 
     waitLastFlingDone();
     _stopFling = false;
 
     // 2.0 is an experience value
     double minFlingValue = 2.0;
-    if (_trackpadLastDelta.dx.abs() > minFlingValue ||
-        _trackpadLastDelta.dy.abs() > minFlingValue) {
+    if (_trackpadLastDelta.dx.abs() > minFlingValue || _trackpadLastDelta.dy.abs() > minFlingValue) {
       _fling = true;
-      _scheduleFling(
-          _trackpadLastDelta.dx, _trackpadLastDelta.dy, _flingBaseDelay);
+      _scheduleFling(_trackpadLastDelta.dx, _trackpadLastDelta.dy, _flingBaseDelay);
     }
     _trackpadLastDelta = Offset.zero;
   }
@@ -522,9 +485,7 @@ class InputModel {
       } else if (dy < 0) {
         dy = 1;
       }
-      bind.sessionSendMouse(
-          sessionId: sessionId,
-          msg: '{"type": "wheel", "x": "$dx", "y": "$dy"}');
+      bind.sessionSendMouse(sessionId: sessionId, msg: '{"type": "wheel", "x": "$dx", "y": "$dy"}');
     }
   }
 
@@ -573,6 +534,7 @@ class InputModel {
   }
 
   void handlePointerEvent(String kind, String type, Offset offset) {
+    print('Sting handlePointerEvent');
     double x = offset.dx;
     double y = offset.dy;
     if (_checkPeerControlProtected(x, y)) {
@@ -606,8 +568,7 @@ class InputModel {
     }
 
     final evt = PointerEventToRust(kind, type, evtValue).toJson();
-    bind.sessionSendPointer(
-        sessionId: sessionId, msg: json.encode(modify(evt)));
+    bind.sessionSendPointer(sessionId: sessionId, msg: json.encode(modify(evt)));
   }
 
   bool _checkPeerControlProtected(double x, double y) {
@@ -618,9 +579,7 @@ class InputModel {
     }
 
     if (!cursorModel.gotMouseControl) {
-      bool selfGetControl =
-          (x - lastMousePos.dx).abs() > kMouseControlDistance ||
-              (y - lastMousePos.dy).abs() > kMouseControlDistance;
+      bool selfGetControl = (x - lastMousePos.dx).abs() > kMouseControlDistance || (y - lastMousePos.dy).abs() > kMouseControlDistance;
       if (selfGetControl) {
         cursorModel.gotMouseControl = true;
       } else {
@@ -637,6 +596,7 @@ class InputModel {
     Offset offset, {
     bool onExit = false,
   }) {
+    print('Sting handleMouse evt:$evt');
     double x = offset.dx;
     double y = max(0.0, offset.dy);
     if (_checkPeerControlProtected(x, y)) {
@@ -680,13 +640,7 @@ class InputModel {
       evt['y'] = '${pos.y}';
     }
 
-    Map<int, String> mapButtons = {
-      kPrimaryMouseButton: 'left',
-      kSecondaryMouseButton: 'right',
-      kMiddleMouseButton: 'wheel',
-      kBackMouseButton: 'back',
-      kForwardMouseButton: 'forward'
-    };
+    Map<int, String> mapButtons = {kPrimaryMouseButton: 'left', kSecondaryMouseButton: 'right', kMiddleMouseButton: 'wheel', kBackMouseButton: 'back', kForwardMouseButton: 'forward'};
     evt['buttons'] = mapButtons[evt['buttons']] ?? '';
     bind.sessionSendMouse(sessionId: sessionId, msg: json.encode(modify(evt)));
   }
@@ -700,6 +654,7 @@ class InputModel {
     bool onExit = false,
     int buttons = kPrimaryMouseButton,
   }) {
+    print('Sting handlePointerDevicePos');
     y -= CanvasModel.topToEdge;
     x -= CanvasModel.leftToEdge;
     final canvasModel = parent.target!.canvasModel;
@@ -756,8 +711,7 @@ class InputModel {
       evtX = x.round();
       evtY = y.round();
     } catch (e) {
-      debugPrintStack(
-          label: 'canvasModel.scale value ${canvasModel.scale}, $e');
+      debugPrintStack(label: 'canvasModel.scale value ${canvasModel.scale}, $e');
       return null;
     }
 
@@ -781,6 +735,7 @@ class InputModel {
 
   /// Web only
   void listenToMouse(bool yesOrNo) {
+    print('Sting listenToMouse');
     if (yesOrNo) {
       platformFFI.startDesktopWebListener();
     } else {
