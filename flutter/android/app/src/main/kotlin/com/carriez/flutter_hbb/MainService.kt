@@ -72,6 +72,7 @@ class MainService : Service() {
     @Keep
     @RequiresApi(Build.VERSION_CODES.N)
     fun rustPointerInput(kind: String, mask: Int, x: Int, y: Int) {
+        Log.d("Sting", "rustPointerInput kind:$kind mask:$mask x:$x y:$y")
         // turn on screen with LIFT_DOWN when screen off
         if (!powerManager.isInteractive && (kind == "touch" || mask == LIFT_DOWN)) {
             if (wakeLock.isHeld) {
@@ -96,6 +97,7 @@ class MainService : Service() {
 
     @Keep
     fun rustGetByName(name: String): String {
+        Log.d("Sting", "rustGetByName name:$name")
         return when (name) {
             "screen_size" -> {
                 JSONObject().apply {
