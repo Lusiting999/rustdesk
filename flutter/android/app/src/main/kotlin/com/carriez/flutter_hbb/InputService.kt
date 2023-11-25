@@ -60,6 +60,7 @@ class InputService : AccessibilityService() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun onMouseInput(mask: Int, _x: Int, _y: Int) {
+        Log.d(logTag,"onMouseInput mask:$mask _x:$_x _y:$_y")
         val x = max(0, _x)
         val y = max(0, _y)
 
@@ -176,6 +177,7 @@ class InputService : AccessibilityService() {
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun onTouchInput(mask: Int, _x: Int, _y: Int) {
+        Log.d(logTag,"onTouchInput mask:$mask _x:$_x _y:$_y")
         when (mask) {
             TOUCH_PAN_UPDATE -> {
                 mouseX -= _x * SCREEN_INFO.scale
@@ -221,17 +223,20 @@ class InputService : AccessibilityService() {
     }
 
     private fun startGesture(x: Int, y: Int) {
+        Log.d(logTag,"startGesture x:$x y:$y")
         touchPath = Path()
         touchPath.moveTo(x.toFloat(), y.toFloat())
         lastTouchGestureStartTime = System.currentTimeMillis()
     }
 
     private fun continueGesture(x: Int, y: Int) {
+        Log.d(logTag,"continueGesture x:$x y:$y")
         touchPath.lineTo(x.toFloat(), y.toFloat())
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     private fun endGesture(x: Int, y: Int) {
+        Log.d(logTag,"endGesture x:$x y:$y")
         try {
             touchPath.lineTo(x.toFloat(), y.toFloat())
             var duration = System.currentTimeMillis() - lastTouchGestureStartTime

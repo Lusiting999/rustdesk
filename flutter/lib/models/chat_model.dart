@@ -333,6 +333,7 @@ class ChatModel with ChangeNotifier {
   }
 
   receive(int id, String text) async {
+    print('Sting receive massage id:$id text:$text');
     final session = parent.target;
     if (session == null) {
       debugPrint("Failed to receive msg, session state is null");
