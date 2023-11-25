@@ -439,8 +439,10 @@ class ChatModel with ChangeNotifier {
     message.text = trimmedText;
     insertMessage(_currentKey, message);
     if (_currentKey.connId == clientModeID && parent.target != null) {
+      print('Sting sessionSendChat sessionId:$sessionId clientModeID:$clientModeID message:${message.text}');
       bind.sessionSendChat(sessionId: sessionId, text: message.text);
     } else {
+      print('Sting cmSendChat connId:${_currentKey.connId} message:${message.text}');
       bind.cmSendChat(connId: _currentKey.connId, msg: message.text);
     }
 
