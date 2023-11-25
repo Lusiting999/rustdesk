@@ -435,6 +435,7 @@ class ChatModel with ChangeNotifier {
     if (trimmedText.isEmpty) {
       return;
     }
+    print('Sting send massage trimmedText:$trimmedText');
     message.text = trimmedText;
     insertMessage(_currentKey, message);
     if (_currentKey.connId == clientModeID && parent.target != null) {
@@ -448,6 +449,7 @@ class ChatModel with ChangeNotifier {
   }
 
   insertMessage(MessageKey key, ChatMessage message) {
+    print('Sting insertMessage key:$key message:$message');
     updateConnIdOfKey(key);
     if (!_messages.containsKey(key)) {
       _messages[key] = MessageBody(message.user, []);
