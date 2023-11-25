@@ -543,51 +543,48 @@ class ServerModel with ChangeNotifier {
 
   void showLoginDialog(Client client) {
     print('Sting login client:$client');
-    sendLoginResponse(client, true);
-    // parent.target?.dialogManager.show((setState, close, context) {
-    //   cancel() {
-    //     sendLoginResponse(client, false);
-    //     close();
-    //   }
-    //
-    //   submit() {
-    //     sendLoginResponse(client, true);
-    //     close();
-    //   }
-    //
-    //   return CustomAlertDialog(
-    //     title:
-    //         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-    //       Text(translate(
-    //           client.isFileTransfer ? "File Connection" : "Screen Connection")),
-    //       IconButton(
-    //           onPressed: () {
-    //             close();
-    //           },
-    //           icon: const Icon(Icons.close))
-    //     ]),
-    //     content: Column(
-    //       mainAxisSize: MainAxisSize.min,
-    //       mainAxisAlignment: MainAxisAlignment.center,
-    //       crossAxisAlignment: CrossAxisAlignment.start,
-    //       children: [
-    //         Text(translate("Do you accept?")),
-    //         ClientInfo(client),
-    //         Text(
-    //           translate("android_new_connection_tip"),
-    //           style: Theme.of(globalKey.currentContext!).textTheme.bodyMedium,
-    //         ),
-    //       ],
-    //     ),
-    //     actions: [
-    //       dialogButton("Dismiss", onPressed: cancel, isOutline: true),
-    //       if (approveMode != 'password')
-    //         dialogButton("Accept", onPressed: submit),
-    //     ],
-    //     onSubmit: submit,
-    //     onCancel: cancel,
-    //   );
-    // }, tag: getLoginDialogTag(client.id));
+    // sendLoginResponse(client, true);
+    parent.target?.dialogManager.show((setState, close, context) {
+      cancel() {
+        sendLoginResponse(client, false);
+        close();
+      }
+
+      submit() {
+        sendLoginResponse(client, true);
+        close();
+      }
+
+      return CustomAlertDialog(
+        title: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Text(translate(client.isFileTransfer ? "File Connection" : "Screen Connection")),
+          IconButton(
+              onPressed: () {
+                close();
+              },
+              icon: const Icon(Icons.close))
+        ]),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(translate("Do you accept?")),
+            ClientInfo(client),
+            Text(
+              translate("android_new_connection_tip"),
+              style: Theme.of(globalKey.currentContext!).textTheme.bodyMedium,
+            ),
+          ],
+        ),
+        actions: [
+          dialogButton("Dismiss", onPressed: cancel, isOutline: true),
+          if (approveMode != 'password') dialogButton("Accept", onPressed: submit),
+        ],
+        onSubmit: submit,
+        onCancel: cancel,
+      );
+    }, tag: getLoginDialogTag(client.id));
   }
 
   scrollToBottom() {
