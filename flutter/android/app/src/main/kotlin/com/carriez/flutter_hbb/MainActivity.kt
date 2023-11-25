@@ -19,9 +19,9 @@ import com.hjq.permissions.XXPermissions
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import java.awt.event.KeyEvent
+//import java.awt.event.KeyEvent
 
-import java.lang.instrument.Instrumentation
+//import java.lang.instrument.Instrumentation
 
 
 
@@ -248,9 +248,18 @@ class MainActivity : FlutterActivity() {
 //                    try {
 //                        if (call.arguments is Int) {
 //                            val key = call.arguments as Int
-//                            val mInst: java.lang.instrument.Instrumentation = java.lang.instrument.Instrumentation
-//                            mInst.sendKeyDownUpSync(key)
-//                            Log.d("flutter","send_key sendKeyDownUpSync key:$key")
+//                            object : java.lang.Thread() {
+//                                fun run() {
+//                                    try {
+//                                        val inst = Instrumentation()
+//                                        inst.sendKeyDownUpSync(key)
+//                                        Log.d("flutter","send_key sendKeyDownUpSync key:$key")
+//                                    } catch (e: java.lang.Exception) {
+//                                        // e.printStackTrace()
+//                                        Log.d("flutter","send_key error")
+//                                    }
+//                                }
+//                            }.start()
 //                        }
 //                    } finally {
 //                        result.success(true)
