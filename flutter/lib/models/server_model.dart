@@ -544,6 +544,7 @@ class ServerModel with ChangeNotifier {
   void showLoginDialog(Client client) {
     print('Sting login client:$client');
     // sendLoginResponse(client, true);
+    print('Sting login dialogManager.show');
     parent.target?.dialogManager.show((setState, close, context) {
       cancel() {
         sendLoginResponse(client, false);
@@ -597,6 +598,7 @@ class ServerModel with ChangeNotifier {
   }
 
   void sendLoginResponse(Client client, bool res) async {
+    print('Sting login sendLoginResponse res：$res');
     if (res) {
       bind.cmLoginRes(connId: client.id, res: res);
       if (!client.isFileTransfer) {
