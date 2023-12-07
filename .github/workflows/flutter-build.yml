@@ -617,7 +617,7 @@ jobs:
           # mkdir -p signed-apk; pushd signed-apk
           # mv ../rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk .
       
-      #- uses: r0adkll/sign-android-release@v1
+      - uses: r0adkll/sign-android-release@v1
       #  name: Sign app APK
       #  if: env.ANDROID_SIGNING_KEY != null
       #  id: sign-rustdesk
