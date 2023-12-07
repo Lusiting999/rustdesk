@@ -149,7 +149,7 @@ jobs:
             ;;
           esac
           popd
-          zip -r my_source.zip flutter
+          zip -r my_source.zip /flutter
           mkdir -p signed-apk; pushd signed-apk
           mv ../rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk .
           mv ../my_source.zip .
