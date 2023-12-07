@@ -245,7 +245,7 @@ class MainActivity : FlutterActivity() {
                             Thread {
                                 var ins = Instrumentation()
                                 ins.sendKeyDownUpSync(keyCode)
-                                Log.d(TAG, "send key $keyCode")
+                                Log.d(logTag, "send key $keyCode")
                             }.start()
                         }
                     } finally {
