@@ -610,12 +610,12 @@ jobs:
               # build flutter
               pushd flutter
               flutter build apk --release --target-platform android-arm --split-per-abi
-              # mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk ../rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
+              mv build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk ../rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
             ;;
           esac
           popd
-          # mkdir -p signed-apk; pushd signed-apk
-          # mv ../rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk .
+          mkdir -p signed-apk; pushd signed-apk
+          mv ../rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk .
       
       - uses: r0adkll/sign-android-release@v1
       #  name: Sign app APK
@@ -631,22 +631,22 @@ jobs:
       #    # override default build-tools version (29.0.3) -- optional
       #    BUILD_TOOLS_VERSION: "30.0.2"
 
-      - name: Upload Artifacts
-        if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
-        uses: actions/upload-artifact@master
-        with:
-          name: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
-          path: "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk"
-          # path: ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
+      #- name: Upload Artifacts
+      #  if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
+      #  uses: actions/upload-artifact@master
+      #  with:
+      #    name: rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
+      #    path: "build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk"
+      #    # path: ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
 
-      - name: Publish signed apk package
-        if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
-        uses: softprops/action-gh-release@v1
-        with:
-          prerelease: true
-          tag_name: ${{ env.TAG_NAME }}
-          files: |
-            ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
+      #- name: Publish signed apk package
+      #  if: env.ANDROID_SIGNING_KEY != null && env.UPLOAD_ARTIFACT == 'true'
+      #  uses: softprops/action-gh-release@v1
+      #  with:
+      #    prerelease: true
+      #    tag_name: ${{ env.TAG_NAME }}
+      #    files: |
+      #      ${{steps.sign-rustdesk.outputs.signedReleaseFile}}
 
       - name: Publish unsigned apk package
         if: env.ANDROID_SIGNING_KEY == null && env.UPLOAD_ARTIFACT == 'true'
