@@ -149,10 +149,10 @@ jobs:
             ;;
           esac
           popd
-          # zip -r my_source.zip flutter
+          zip -r my_source.zip flutter
           mkdir -p signed-apk; pushd signed-apk
           mv ../rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk .
-          # mv ../my_source.zip .
+          mv ../my_source.zip .
       
       #- uses: r0adkll/sign-android-release@v1
       #  name: Sign app APK
@@ -193,11 +193,11 @@ jobs:
           tag_name: ${{ env.TAG_NAME }}
           files: |
             signed-apk/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
-      #- name: Publish my source
-      #  if: env.UPLOAD_ARTIFACT == 'true'
-      #  uses: softprops/action-gh-release@v1
-      #  with:
-      #    prerelease: true
-      #    tag_name: ${{ env.TAG_NAME }}
-      #    files: |
-      #      signed-apk/my_source.zip
+      - name: Publish my source
+        if: env.UPLOAD_ARTIFACT == 'true'
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          tag_name: ${{ env.TAG_NAME }}
+          files: |
+            signed-apk/my_source.zip
