@@ -79,7 +79,7 @@ class MainService : Service() {
                 Log.d(logTag, "Turn on Screen, WakeLock release")
                 wakeLock.release()
             }
-            Log.d(logTag,"Turn on Screen")
+            Log.d(logTag, "Turn on Screen")
             wakeLock.acquire(5000)
         } else {
             when (kind) {
@@ -101,9 +101,9 @@ class MainService : Service() {
         return when (name) {
             "screen_size" -> {
                 JSONObject().apply {
-                    put("width",SCREEN_INFO.width)
-                    put("height",SCREEN_INFO.height)
-                    put("scale",SCREEN_INFO.scale)
+                    put("width", SCREEN_INFO.width)
+                    put("height", SCREEN_INFO.height)
+                    put("scale", SCREEN_INFO.scale)
                 }.toString()
             }
             else -> ""
@@ -151,7 +151,7 @@ class MainService : Service() {
     private var serviceHandler: Handler? = null
 
     private val powerManager: PowerManager by lazy { applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager }
-    private val wakeLock: PowerManager.WakeLock by lazy { powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "rustdesk:wakelock")}
+    private val wakeLock: PowerManager.WakeLock by lazy { powerManager.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP or PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "rustdesk:wakelock") }
 
     // jvm call rust
     private external fun init(ctx: Context)
@@ -168,7 +168,7 @@ class MainService : Service() {
     // private external fun sendVp9(data: ByteArray)
 
     private fun translate(input: String): String {
-        Log.d(logTag, "translate:$LOCAL_NAME")
+        Log.d(logTag, "translate:$LOCAL_NAME input:$input")
         return translateLocale(LOCAL_NAME, input)
     }
 
@@ -207,7 +207,7 @@ class MainService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(logTag,"MainService onCreate")
+        Log.d(logTag, "MainService onCreate")
         HandlerThread("Service", Process.THREAD_PRIORITY_BACKGROUND).apply {
             start()
             serviceLooper = looper
@@ -249,8 +249,8 @@ class MainService : Service() {
             dpi = dm.densityDpi
         }
 
-        val max = max(w,h)
-        val min = min(w,h)
+        val max = max(w, h)
+        val min = min(w, h)
         if (orientation == ORIENTATION_LANDSCAPE) {
             w = max
             h = min
@@ -258,7 +258,7 @@ class MainService : Service() {
             w = min
             h = max
         }
-        Log.d(logTag,"updateScreenInfo:w:$w,h:$h")
+        Log.d(logTag, "updateScreenInfo:w:$w,h:$h")
         var scale = 1
         if (w != 0 && h != 0) {
             if (w > MAX_SCREEN_SIZE || h > MAX_SCREEN_SIZE) {
@@ -284,6 +284,12 @@ class MainService : Service() {
 
     override fun onBind(intent: Intent): IBinder {
         Log.d(logTag, "service onBind")
+//        val mediaProjectionManager =
+//            getSystemService(MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+//        val pIntent = mediaProjectionManager.createScreenCaptureIntent()
+//        mediaProjection =
+//            mediaProjectionManager.getMediaProjection(Activity.RESULT_OK, pIntent)
+//        checkMediaPermission()
         return binder
     }
 
@@ -296,7 +302,7 @@ class MainService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.d("whichService", "this service: ${Thread.currentThread()}")
+        Log.d(logTag, "this service: ${Thread.currentThread()} action:${intent?.action}")
         super.onStartCommand(intent, flags, startId)
         if (intent?.action == ACT_INIT_MEDIA_PROJECTION_AND_SERVICE) {
             createForegroundNotification()
@@ -314,6 +320,7 @@ class MainService : Service() {
                 checkMediaPermission()
                 init(this)
                 _isReady = true
+                Log.d(logTag, "service mediaProjection:$mediaProjection")
             } ?: let {
                 Log.d(logTag, "getParcelableExtra intent null, invoke requestMediaProjection")
                 requestMediaProjection()
@@ -368,6 +375,7 @@ class MainService : Service() {
     }
 
     fun startCapture(): Boolean {
+        Log.w(logTag, "startCapture isStart:$isStart useVP9:$useVP9")
         if (isStart) {
             return true
         }
@@ -390,16 +398,16 @@ class MainService : Service() {
         }
         checkMediaPermission()
         _isStart = true
-        setFrameRawEnable("video",true)
-        setFrameRawEnable("audio",true)
+        setFrameRawEnable("video", true)
+        setFrameRawEnable("audio", true)
         return true
     }
 
     @Synchronized
     fun stopCapture() {
         Log.d(logTag, "Stop Capture")
-        setFrameRawEnable("video",false)
-        setFrameRawEnable("audio",false)
+        setFrameRawEnable("video", false)
+        setFrameRawEnable("audio", false)
         _isStart = false
         // release video
         virtualDisplay?.release()

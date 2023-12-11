@@ -51,9 +51,7 @@ Future<void> main(List<String> args) async {
     if (!Platform.isMacOS) {
       WindowController.fromWindowId(kWindowId!).showTitleBar(false);
     }
-    final argument = args[2].isEmpty
-        ? <String, dynamic>{}
-        : jsonDecode(args[2]) as Map<String, dynamic>;
+    final argument = args[2].isEmpty ? <String, dynamic>{} : jsonDecode(args[2]) as Map<String, dynamic>;
     int type = argument['type'] ?? -1;
     // to-do: No need to parse window id ?
     // Because stateGlobal.windowId is a global value.
@@ -199,12 +197,10 @@ void runMultiWindow(
   }
   switch (appType) {
     case kAppTypeDesktopRemote:
-      await restoreWindowPosition(WindowType.RemoteDesktop,
-          windowId: kWindowId!, peerId: argument['id'] as String?);
+      await restoreWindowPosition(WindowType.RemoteDesktop, windowId: kWindowId!, peerId: argument['id'] as String?);
       break;
     case kAppTypeDesktopFileTransfer:
-      await restoreWindowPosition(WindowType.FileTransfer,
-          windowId: kWindowId!);
+      await restoreWindowPosition(WindowType.FileTransfer, windowId: kWindowId!);
       break;
     case kAppTypeDesktopPortForward:
       await restoreWindowPosition(WindowType.PortForward, windowId: kWindowId!);
@@ -239,26 +235,19 @@ bool _isCmReadyToShow = false;
 
 showCmWindow({bool isStartup = false}) async {
   if (isStartup) {
-    WindowOptions windowOptions = getHiddenTitleBarWindowOptions(
-        size: kConnectionManagerWindowSizeClosedChat);
+    WindowOptions windowOptions = getHiddenTitleBarWindowOptions(size: kConnectionManagerWindowSizeClosedChat);
     await windowManager.waitUntilReadyToShow(windowOptions, null);
     bind.mainHideDocker();
-    await Future.wait([
-      windowManager.show(),
-      windowManager.focus(),
-      windowManager.setOpacity(1)
-    ]);
+    await Future.wait([windowManager.show(), windowManager.focus(), windowManager.setOpacity(1)]);
     // ensure initial window size to be changed
-    await windowManager.setSizeAlignment(
-        kConnectionManagerWindowSizeClosedChat, Alignment.topRight);
+    await windowManager.setSizeAlignment(kConnectionManagerWindowSizeClosedChat, Alignment.topRight);
     _isCmReadyToShow = true;
   } else if (_isCmReadyToShow) {
     if (await windowManager.getOpacity() != 1) {
       await windowManager.setOpacity(1);
       await windowManager.focus();
       await windowManager.minimize(); //needed
-      await windowManager.setSizeAlignment(
-          kConnectionManagerWindowSizeClosedChat, Alignment.topRight);
+      await windowManager.setSizeAlignment(kConnectionManagerWindowSizeClosedChat, Alignment.topRight);
       windowOnTop(null);
     }
   }
@@ -266,8 +255,7 @@ showCmWindow({bool isStartup = false}) async {
 
 hideCmWindow({bool isStartup = false}) async {
   if (isStartup) {
-    WindowOptions windowOptions = getHiddenTitleBarWindowOptions(
-        size: kConnectionManagerWindowSizeClosedChat);
+    WindowOptions windowOptions = getHiddenTitleBarWindowOptions(size: kConnectionManagerWindowSizeClosedChat);
     windowManager.setOpacity(0);
     await windowManager.waitUntilReadyToShow(windowOptions, null);
     bind.mainHideDocker();
@@ -322,8 +310,7 @@ void runInstallPage() async {
   await windowManager.ensureInitialized();
   await initEnv(kAppTypeMain);
   _runApp('', const InstallPage(), MyTheme.currentThemeMode());
-  WindowOptions windowOptions =
-      getHiddenTitleBarWindowOptions(size: Size(800, 600), center: true);
+  WindowOptions windowOptions = getHiddenTitleBarWindowOptions(size: Size(800, 600), center: true);
   windowManager.waitUntilReadyToShow(windowOptions, () async {
     windowManager.show();
     windowManager.focus();
@@ -333,8 +320,7 @@ void runInstallPage() async {
   });
 }
 
-WindowOptions getHiddenTitleBarWindowOptions(
-    {Size? size, bool center = false}) {
+WindowOptions getHiddenTitleBarWindowOptions({Size? size, bool center = false}) {
   var defaultTitleBarStyle = TitleBarStyle.hidden;
   // we do not hide titlebar on win7 because of the frame overflow.
   if (kUseCompatibleUiMode) {
@@ -362,9 +348,7 @@ class _AppState extends State<App> {
       final userPreference = MyTheme.getThemeModePreference();
       if (userPreference != ThemeMode.system) return;
       WidgetsBinding.instance.handlePlatformBrightnessChanged();
-      final systemIsDark =
-          WidgetsBinding.instance.platformDispatcher.platformBrightness ==
-              Brightness.dark;
+      final systemIsDark = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
       final ThemeMode to;
       if (systemIsDark) {
         to = ThemeMode.dark;
@@ -406,7 +390,7 @@ class _AppState extends State<App> {
               ? const DesktopTabPage()
               : isWeb
                   ? WebHomePage()
-                  : HomePage(),
+                  : HomePage2(),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

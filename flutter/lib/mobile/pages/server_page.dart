@@ -311,12 +311,12 @@ class _ScamWarningDialogState extends State<ScamWarningDialog> {
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Center(
-              child: Image.asset('assets/scam.png',
-              width: 180,
-              ),
-            ),
+            // SizedBox(height: 20),
+            // Center(
+            //   child: Image.asset('assets/scam.png',
+            //   width: 180,
+            //   ),
+            // ),
             SizedBox(height: 18),
             Text(
               translate("scam_title"),

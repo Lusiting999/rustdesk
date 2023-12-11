@@ -27,6 +27,7 @@ class PermissionRequestTransparentActivity: Activity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.d(logTag, "onActivityResult requestCode:$requestCode data:$data")
         if (requestCode == REQ_REQUEST_MEDIA_PROJECTION) {
             if (resultCode == RESULT_OK && data != null) {
                 launchService(data)

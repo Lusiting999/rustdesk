@@ -9,11 +9,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hbb/consts.dart';
 import 'package:flutter_hbb/main.dart';
+import 'package:flutter_hbb/models/platform_model.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../common.dart';
 import '../generated_bridge.dart';
+
+import 'package:flutter_hbb/models/server_model.dart';
 
 class RgbaFrame extends Struct {
   @Uint32()
@@ -28,6 +31,7 @@ typedef HandleEvent = Future<void> Function(Map<String, dynamic> evt);
 /// Hides the platform differences.
 class PlatformFFI {
   String _dir = '';
+
   // _homeDir is only needed for Android and IOS.
   String _homeDir = '';
   final _eventHandlers = <String, Map<String, HandleEvent>>{};
@@ -38,7 +42,7 @@ class PlatformFFI {
   PlatformFFI._();
 
   static final PlatformFFI instance = PlatformFFI._();
-  final _toAndroidChannel = const MethodChannel('mChannel');
+  static final toAndroidChannel = const MethodChannel('mChannel');
 
   RustdeskImpl get ffiBind => _ffiBind;
   F3? _session_get_rgba;
@@ -47,13 +51,18 @@ class PlatformFFI {
 
   static get isMain => instance._appType == kAppTypeMain;
 
+  static Function(dynamic)? _myListener;
+
+  static setListener(Function(dynamic) listener){
+    _myListener = listener;
+  }
+
   static Future<String> getVersion() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     return packageInfo.version;
   }
 
-  bool registerEventHandler(
-      String eventName, String handlerName, HandleEvent handler) {
+  bool registerEventHandler(String eventName, String handlerName, HandleEvent handler) {
     debugPrint('registerEventHandler $eventName $handlerName');
     var handlers = _eventHandlers[eventName];
     if (handlers == null) {
@@ -77,8 +86,7 @@ class PlatformFFI {
     }
   }
 
-  String translate(String name, String locale) =>
-      _ffiBind.translate(name: name, locale: locale);
+  String translate(String name, String locale) => _ffiBind.translate(name: name, locale: locale);
 
   Uint8List? getRgba(SessionID sessionId, int bufSize) {
     if (_session_get_rgba == null) return null;
@@ -96,12 +104,11 @@ class PlatformFFI {
     }
   }
 
-  int getRgbaSize(SessionID sessionId) =>
-      _ffiBind.sessionGetRgbaSize(sessionId: sessionId);
-  void nextRgba(SessionID sessionId) =>
-      _ffiBind.sessionNextRgba(sessionId: sessionId);
-  void registerTexture(SessionID sessionId, int ptr) =>
-      _ffiBind.sessionRegisterTexture(sessionId: sessionId, ptr: ptr);
+  int getRgbaSize(SessionID sessionId) => _ffiBind.sessionGetRgbaSize(sessionId: sessionId);
+
+  void nextRgba(SessionID sessionId) => _ffiBind.sessionNextRgba(sessionId: sessionId);
+
+  void registerTexture(SessionID sessionId, int ptr) => _ffiBind.sessionRegisterTexture(sessionId: sessionId, ptr: ptr);
 
   /// Init the FFI class, loads the native Rust core library.
   Future<void> init(String appType) async {
@@ -180,11 +187,9 @@ class PlatformFFI {
         id = macOsInfo.systemGUID ?? '';
       }
       if (isAndroid || isIOS) {
-        debugPrint(
-            '_appType:$_appType,info1-id:$id,info2-name:$name,dir:$_dir,homeDir:$_homeDir');
+        debugPrint('_appType:$_appType,info1-id:$id,info2-name:$name,dir:$_dir,homeDir:$_homeDir');
       } else {
-        debugPrint(
-            '_appType:$_appType,info1-id:$id,info2-name:$name,dir:$_dir');
+        debugPrint('_appType:$_appType,info1-id:$id,info2-name:$name,dir:$_dir');
       }
       if (desktopType == DesktopType.cm) {
         await _ffiBind.cmInit();
@@ -217,14 +222,15 @@ class PlatformFFI {
 
   /// Start listening to the Rust core's events and frames.
   void _startListenEvent(RustdeskImpl rustdeskImpl) {
-    final appType =
-        _appType == kAppTypeDesktopRemote ? '$_appType,$kWindowId' : _appType;
+    final appType = _appType == kAppTypeDesktopRemote ? '$_appType,$kWindowId' : _appType;
     var sink = rustdeskImpl.startGlobalEventStream(appType: appType);
     sink.listen((message) {
       () async {
         try {
           Map<String, dynamic> event = json.decode(message);
           print('Sting startListenEvent:$event');
+          _myListener!(event);
+          // goAutoCheck(event);
           // _tryHandle here may be more flexible than _eventCallback
           if (!await tryHandle(event)) {
             if (_eventCallback != null) {
@@ -238,6 +244,38 @@ class PlatformFFI {
     });
   }
 
+  // void goAutoCheck(Map evt) {
+  //   try {
+  //     var name = evt['name'];
+  //     print('Sting goAutoCheck name:$name');
+  //     if (name == 'add_connection') {
+  //       final client = Client.fromJson(jsonDecode(evt["client"]));
+  //       print('Sting goAutoCheck cmLoginRes client.id:${client.id}');
+  //       bind.cmLoginRes(connId: client.id, res: true);
+  //       if (!client.isFileTransfer) {
+  //         print('Sting goAutoCheck start_capture');
+  //         PlatformFFI.toAndroidChannel.invokeMethod("start_capture");
+  //       }
+  //       PlatformFFI.toAndroidChannel.invokeMethod("cancel_notification", client.id);
+  //     } else if (name == 'chat_server_mode') {
+  //       print('Sting event go');
+  //       var text = evt['text'];
+  //       int keyCode = -1;
+  //       if (text is String) {
+  //         keyCode = json.decode(text)['keyCode'] ?? -1;
+  //       } else {
+  //         keyCode = text['keyCode'] ?? -1;
+  //       }
+  //       if (keyCode != -1) {
+  //         print('Sting event send key $keyCode');
+  //         PlatformFFI.toAndroidChannel.invokeMethod("send_key", keyCode);
+  //       } else {
+  //         print('Sting event send key error!!!');
+  //       }
+  //     }
+  //   } catch (e) {}
+  // }
+
   void setEventCallback(StreamEventHandler fun) async {
     _eventCallback = fun;
   }
@@ -249,7 +287,7 @@ class PlatformFFI {
   void stopDesktopWebListener() {}
 
   void setMethodCallHandler(FMethod callback) {
-    _toAndroidChannel.setMethodCallHandler((call) async {
+    toAndroidChannel.setMethodCallHandler((call) async {
       callback(call.method, call.arguments);
       return null;
     });
@@ -257,7 +295,7 @@ class PlatformFFI {
 
   invokeMethod(String method, [dynamic arguments]) async {
     if (!isAndroid) return Future<bool>(() => false);
-    return await _toAndroidChannel.invokeMethod(method, arguments);
+    return await toAndroidChannel.invokeMethod(method, arguments);
   }
 
   void syncAndroidServiceAppDirConfigPath() {

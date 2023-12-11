@@ -20,6 +20,9 @@ import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 import android.app.Instrumentation
+import android.os.Bundle
+import android.os.PersistableBundle
+import org.json.JSONObject
 
 class MainActivity : FlutterActivity() {
     companion object {
@@ -29,6 +32,24 @@ class MainActivity : FlutterActivity() {
     private val channelTag = "mChannel"
     private val logTag = "mMainActivity"
     private var mainService: MainService? = null
+
+    private var serverUrl = "remote.skywayplatform.com:21116"
+    private var serverKey = "67Wh8GdegxRvaai2KcCgOj8DpziuOGeB8IbRanhkVFE="
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Log.d(logTag, "Sting onCreate intent:${intent.extras}")
+        val url = intent.extras?.getString("serverUrl", "")
+        if (url != null && url.isNotEmpty()) {
+            serverUrl = url
+        }
+        val key = intent.extras?.getString("serverKey", "")
+        if (key != null && key.isNotEmpty()) {
+            serverKey = key
+        }
+        Log.d(logTag, "Sting onCreate intent url:$url key:$key")
+        Log.d(logTag, "Sting data serverUrl:$serverUrl serverKey:$serverKey")
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -94,8 +115,14 @@ class MainActivity : FlutterActivity() {
         Log.d(logTag, "Sting initFlutterChannel")
         flutterMethodChannel.setMethodCallHandler { call, result ->
             // make sure result will be invoked, otherwise flutter will await forever
-            Log.d(logTag,"Sting method:${call.method} arguments:${call.arguments}")
+            Log.d(logTag, "Sting method:${call.method} arguments:${call.arguments} MainService.isReady:${MainService.isReady}")
             when (call.method) {
+                "get_config" -> {
+                    val json = JSONObject()
+                    json.put("serverUrl", serverUrl)
+                    json.put("serverKey", serverKey)
+                    result.success(json.toString());
+                }
                 "init_service" -> {
                     Intent(activity, MainService::class.java).also {
                         bindService(it, serviceConnection, Context.BIND_AUTO_CREATE)
@@ -227,7 +254,7 @@ class MainActivity : FlutterActivity() {
                             if (mapValues.size == 2) {
                                 val id = mapValues[0]
                                 val pass = mapValues[1]
-                                Log.d(logTag,"Sting sendBroadcast id$id pass:$pass")
+                                Log.d(logTag, "Sting sendBroadcast id$id pass:$pass")
                                 val intent = Intent("com.skyway.client.rust.DATA")
                                 intent.putExtra("ID", id)
                                 intent.putExtra("Password", pass)
@@ -248,6 +275,13 @@ class MainActivity : FlutterActivity() {
                                 Log.d(logTag, "send key $keyCode")
                             }.start()
                         }
+                    } finally {
+                        result.success(true)
+                    }
+                }
+                "moveTaskToBack" -> {
+                    try {
+                        moveTaskToBack(true);
                     } finally {
                         result.success(true)
                     }
